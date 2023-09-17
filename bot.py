@@ -10,10 +10,6 @@ app = Client("bot", api_id=api_id, api_hash=api_hash)
 
 @app.on_message(filters.chat(posts_from_3))
 async def on_new_message_3(client, message:Message):
-    if date.today().weekday() > 5:
-        return
-    if datetime.now(zone).hour < 9 or datetime.now(zone).hour > 22:
-        return
     text = ''
     file_id = None
     if message.text:
