@@ -1,3 +1,4 @@
+import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from datetime import datetime, date
@@ -12,14 +13,18 @@ app = Client("bot", api_id=api_id, api_hash=api_hash)
 async def on_new_message_3(client, message:Message):
     text = ''
     file_id = None
+    file_path = None
     if message.text:
         text = message.text
     elif message.photo:
         if message.caption:
             text = message.caption
-            file_id = message.photo.file_id
+            file_path = await app.download_media(message.photo.file_id)
         else:
-            await app.send_photo(send_to_3, message.photo.file_id)
+            file_path = await app.download_media(message.photo.file_id)
+            with open(file_path, 'rb') as f:
+                await app.send_photo(send_to_3, f)
+            os.remove(file_path)
             return
 
     if '15:00' in text.lower():
@@ -62,11 +67,11 @@ async def on_new_message_3(client, message:Message):
         await app.send_message(send_to_3, DOUBNEDEAL_MESSAGE)
         return
     else:
-        if file_id:
-            await app.send_photo(send_to_3, file_id, text)
-            return
+        if file_path:
+            with open(file_path, 'rb') as f:
+                await app.send_photo(send_to_3, f)
+            os.remove(file_path)
         else:
             await app.send_message(send_to_3, text)
-            return
 
 app.run()
